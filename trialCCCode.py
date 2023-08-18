@@ -3,8 +3,9 @@ import time
 import clr
 
 # Paths for ttInterface.dll - Update these accordingly
-sys.path.append("C:\\...\\Release")
-clr.AddReference("C:\\...\\Release\\ttInterface.dll")
+sys.path.append('C:\\Users\\lab\\Downloads\\CD V2.35.01\\Applications\\TimeTagExplorer\\Release_2_35_64Bit\\Release')
+clr.AddReference('C:\\Users\\lab\\Downloads\\CD V2.35.01\\Applications\\TimeTagExplorer\\Release_2_35_64Bit\\Release\\ttInterface.dll')
+
 
 from System import Array, Byte, Int64
 from TimeTag import TTInterface
@@ -33,3 +34,10 @@ MyTagger.StopTimetags()
 
 # The arrays 'chans' and 'times' now hold the readings for 1 second.
 # Additional analysis can be done on these data as required.
+print(f"Number of Tags: {num_tags}")
+
+for i in range(len(chans)):
+    print(f"Channels: {chans[i]}")
+
+for i in range(len(times)):
+    print(f"Times: {times[i]}")
