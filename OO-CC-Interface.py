@@ -5,9 +5,12 @@ import sys
 import time
 import clr
 
+# Simulated Annealing Implementation
+import random
+import math
+
 sys.path.append('C:\\Users\\lab\\Downloads\\CD V2.35.01\\Applications\\TimeTagExplorer\\Release_2_35_64Bit\\Release')
 clr.AddReference('C:\\Users\\lab\\Downloads\\CD V2.35.01\\Applications\\TimeTagExplorer\\Release_2_35_64Bit\\Release\\ttInterface.dll')
-
 
 from System import Array, Byte, Int64, Int32
 from TimeTag import TTInterface, Logic
@@ -109,17 +112,52 @@ class OptimizationAlgorithm(ABC):
     def optimize(self, experiment):
         pass
 
-# Genetic Algorithm Implementation
-class GeneticAlgorithm(OptimizationAlgorithm):
-    def optimize(self, experiment):
-        # Implement GA here
-        pass
-
-# Simulated Annealing Implementation
 class SimulatedAnnealing(OptimizationAlgorithm):
+    def __init__(self, step_size=1, initial_temperature=1000, cooling_rate=0.95, max_iterations=10000):
+        self.step_size = step_size
+        self.initial_temperature = initial_temperature
+        self.cooling_rate = cooling_rate
+        self.max_iterations = max_iterations
+
+    def energy(self, solution, experiment):
+        avg_photon_count, _ = experiment.evaluate_solution(solution)
+        return avg_photon_count
+
+    def neighbor(self, solution):
+        # Generate a neighboring solution by adjusting each axis by a small random step
+        new_solution = [axis + random.uniform(-self.step_size, self.step_size) for axis in solution]
+        return new_solution
+
+    def acceptance_probability(self, energy_old, energy_new, temperature):
+        if energy_new > energy_old:
+            return 1.0
+        return math.exp((energy_new - energy_old) / temperature)
+
     def optimize(self, experiment):
-        # Implement SA here
-        pass
+        current_solution = experiment.get_motor_coordinates()  # Initialize with the current positions of the axes
+        current_energy = self.energy(current_solution, experiment)
+        
+        best_solution = current_solution
+        best_energy = current_energy
+        
+        temperature = self.initial_temperature
+
+        for iteration in range(self.max_iterations):
+            neighbor_solution = self.neighbor(current_solution)
+            neighbor_energy = self.energy(neighbor_solution, experiment)
+
+            if self.acceptance_probability(current_energy, neighbor_energy, temperature) > random.random():
+                current_solution = neighbor_solution
+                current_energy = neighbor_energy
+
+                if current_energy > best_energy:
+                    best_energy = current_energy
+                    best_solution = current_solution
+
+            temperature *= self.cooling_rate
+        
+        print("Optimal solution found with average photon count:", best_energy)
+        return best_solution
 
 # Main Controller
 class Controller:
@@ -135,6 +173,5 @@ class Controller:
 # Example Usage
 experiment = Experiment()
 timeInterval = 0.5
-channel = 2
 for i in range(4):
     experiment.run_logic_reading(timeInterval)
