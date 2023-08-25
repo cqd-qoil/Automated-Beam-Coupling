@@ -4,6 +4,11 @@ from abc import ABC, abstractmethod
 import sys
 import time
 import clr
+
+sys.path.append('C:\\Users\\lab\\Downloads\\CD V2.35.01\\Applications\\TimeTagExplorer\\Release_2_35_64Bit\\Release')
+clr.AddReference('C:\\Users\\lab\\Downloads\\CD V2.35.01\\Applications\\TimeTagExplorer\\Release_2_35_64Bit\\Release\\ttInterface.dll')
+
+
 from System import Array, Byte, Int64, Int32
 from TimeTag import TTInterface, Logic
 
@@ -14,22 +19,22 @@ import zaber_motion as zm
 # Experiment Interface
 class Experiment:
     def __init__(self):
-
         # Initialization code, including opening the tagger
         self.MyTagger = TTInterface()
         self.MyTagger.Open()
-
+        
         # Configure the channel for measurement
         self.test_channel = 2
         self.MyTagger.SetInputThreshold(self.test_channel, 0.5)
-
+        
         # Activate the Logic Mode
         self.MyLogic = Logic(self.MyTagger)
         self.MyLogic.SwitchLogicMode()
+        
         self.TimerCounter1 = Int32
-        self.MyLogic.ReadLogic()
-
-        self.open_motor_connection()
+        self.clearBuffer()
+        
+        #self.open_motor_connection()
 
     def open_motor_connection(self):
         global connection
@@ -69,30 +74,31 @@ class Experiment:
         return counts, delta_t
 
     def printData(self, counts, delta_t, k):
-        delta_t_text = "Delta-T [s] = %.4f, " %(delta_t)
-        counter_text = " Ch%d Events = %d," %(k,counts)
-        freq_text = " Freq [Hz] = %.2f, " %(counts/delta_t)
+        delta_t_text = "\n Delta-T [s] = %.4f, " %(delta_t)
+        counter_text = "\n Ch%d Counts per %.2f [S] Interval = %d," %(k,timeInterval,counts)
+        freq_text = "\n Normalised Counts per S = %.2f, " %(counts/delta_t)
         print(delta_t_text +counter_text + freq_text)
 
     def getAvgPhotonCount(self, timeInterval, channel):
         counts_list = []
-        for i in range(1, 20):
+        num_counts = 10
+        for i in range(1, num_counts):
             self.clearBuffer()
             counts, delta_t = self.readCounts(timeInterval, channel)
             counts_list.append(counts / delta_t)
         counts_avg = sum(counts_list) / len(counts_list)
-        return counts_avg
+        return counts_avg, delta_t
     
-    def run_logic_reading(self, timeInterval, channel):
+    def run_logic_reading(self, timeInterval):
         self.clearBuffer()
-        counts, delta_t = self.readCounts(timeInterval, channel)
-        self.printData(counts, delta_t, channel)
+        counts, delta_t = self.getAvgPhotonCount(timeInterval, self.test_channel)
+        self.printData(counts, delta_t, self.test_channel)
 
     def evaluate_solution(self, solution):
         timeInterval = 0.5
         channel = self.test_channel
         # Move to the solution's coordinates
-        self.move_to_array(solution)
+        #self.move_to_array(solution)
         # Add your code to evaluate the quality of the alignment, e.g., by measuring the average photon count
         avg_photon_count = self.getAvgPhotonCount(timeInterval, channel)
         return avg_photon_count
@@ -130,4 +136,5 @@ class Controller:
 experiment = Experiment()
 timeInterval = 0.5
 channel = 2
-experiment.run_logic_reading(timeInterval, channel)
+for i in range(4):
+    experiment.run_logic_reading(timeInterval)
