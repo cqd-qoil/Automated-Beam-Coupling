@@ -44,7 +44,7 @@ class Experiment:
     def open_motor_connection(self):
         self.connection = zmb.Connection.open_serial_port('COM3')
         self.device_list = self.connection.detect_devices()
-        print("Connection open")
+        print("\nConnection open\n")
         print("Found {} devices".format(len(self.device_list)))
 
     def close_motor_connection(self):
@@ -113,7 +113,7 @@ class OptimizationAlgorithm(ABC):
         pass
 
 class SimulatedAnnealing(OptimizationAlgorithm):
-    def __init__(self, experiment, step_size=5, initial_temperature=1000, cooling_rate=0.95, max_iterations=10000, convergence_threshold=0.001, convergence_lookback=5):
+    def __init__(self, experiment, step_size=200, initial_temperature=1000, cooling_rate=0.95, max_iterations=10000, convergence_threshold=0.001, convergence_lookback=10):
         self.step_size = step_size
         self.initial_temperature = initial_temperature
         self.cooling_rate = cooling_rate
@@ -130,7 +130,7 @@ class SimulatedAnnealing(OptimizationAlgorithm):
         min_energy = min(recent_energies)
         max_energy = max(recent_energies)
 
-        return (max_energy - min_energy) < self.convergence_threshold
+        return ((max_energy - min_energy)/(max_energy + min_energy)) < self.convergence_threshold
     
     def energy(self, solution, experiment):
         avg_photon_count, _ = experiment.evaluate_solution(solution)
@@ -155,10 +155,21 @@ class SimulatedAnnealing(OptimizationAlgorithm):
         
         temperature = self.initial_temperature
 
+        database = Database()
+
         for iteration in range(self.max_iterations):
             neighbor_solution = self.neighbor(current_solution)
             neighbor_energy = self.energy(neighbor_solution, experiment)
+            
+            print("\n\nIteration num: ", iteration)
+            print("Temperature: ", temperature)
+            print("Step Size: ", self.step_size)
+            print("Current Solution: ", current_solution)
+            print("Current Energy: ", current_energy)
+            print("Neighbour Solution: ", neighbor_solution)
+            print("Neighbour Energy: ", neighbor_energy)
 
+            
             if self.acceptance_probability(current_energy, neighbor_energy, temperature) > random.random():
                 current_solution = neighbor_solution
                 current_energy = neighbor_energy
@@ -170,9 +181,10 @@ class SimulatedAnnealing(OptimizationAlgorithm):
             #Move from 'neighbour' to current solution  
             experiment.move_to_array(current_solution)
             self.past_energies.append(current_energy)
+            database.addData(temperature, current_energy, current_solution)
             
             if self.check_convergence():
-                print("Convergence criteria met. Stopping optimization.")
+                print("\nConvergence criteria met. Stopping optimization.")
                 break
 
             temperature *= self.cooling_rate
@@ -192,17 +204,39 @@ class Controller:
         print("Optimal solution found:", optimal_solution)
         experiment.close_motor_connection()
 
+class Database:
+    def __init__(self):
+        self.templist = []
+        self.energylist = []
+        self.solutions = []
+
+    def addData(self, temp, energy, solution):
+        self.addtemp(temp)
+        self.addenergy(energy)
+        self.addsolution(solution)
+
+    def addtemp(self, temp):
+        self.templist.append(temp)
+    def addenergy(self, energy):
+        self.templist.append(energy)
+    def addsolution(self, solution):
+        self.templist.append(solution)
+    
+    def model(self, type, obj_1, obj_2):
+        pass
+
 # Example Usage
 experiment = Experiment()
 timeInterval = 0.5
-for i in range(4):
-    experiment.run_logic_reading(timeInterval)
+print("Energy: ", experiment.run_logic_reading(timeInterval))
+print("Solution: ",experiment.get_motor_coordinates())
+
 
 # # Initialize experiment and algorithm
 # experiment = Experiment()
-# simulated_annealing_algorithm = SimulatedAnnealing(step_size=5, initial_temperature=1000, cooling_rate=0.95, max_iterations=10000)
+# simulated_annealing_algorithm = SimulatedAnnealing(experiment)
 
 # # Create controller and run optimization
 # controller = Controller(experiment, simulated_annealing_algorithm)
-# controller.run()
+# controller.run(experiment)
 
