@@ -5,15 +5,17 @@ import sys
 import time
 import clr
 
-# Simulated Annealing Implementation
-import random
-import math
-
+#Adding Logic16 driver to path ensure this is 64bit version and that you have selected allow permissions
 sys.path.append('C:\\Users\\lab\\Downloads\\CD V2.35.01\\Applications\\TimeTagExplorer\\Release_2_35_64Bit\\Release')
 clr.AddReference('C:\\Users\\lab\\Downloads\\CD V2.35.01\\Applications\\TimeTagExplorer\\Release_2_35_64Bit\\Release\\ttInterface.dll')
 
+#Time Tagging Libraries
 from System import Array, Byte, Int64, Int32
 from TimeTag import TTInterface, Logic
+
+#Algorithm Libraries
+import random
+import math
 
 #Zaber Motion Libraries
 import zaber_motion.binary as zmb
@@ -37,15 +39,13 @@ class Experiment:
         self.TimerCounter1 = Int32
         self.clearBuffer()
         
-        #self.open_motor_connection()
+        self.open_motor_connection()
 
     def open_motor_connection(self):
-        global connection
-        global device_list
         self.connection = zmb.Connection.open_serial_port('COM3')
         self.device_list = self.connection.detect_devices()
         print("Connection open")
-        print("Found {} devices".format(len(device_list)))
+        print("Found {} devices".format(len(self.device_list)))
 
     def close_motor_connection(self):
         self.connection.close()
@@ -53,14 +53,14 @@ class Experiment:
 
     def get_motor_coordinates(self):
         current_coords = []
-        for device in range(0, 4):
+        for device in range(len(self.device_list)):
             device = self.device_list[device]
             current_coords.extend([device.get_position()]) 
         return current_coords
 
     def move_to_array(self, array):
-        for i in range(len(device_list)):
-            device = device_list[i]
+        for i in range(len(self.device_list)):
+            device = self.device_list[i]
             device.move_absolute(array[i], zm.Units.NATIVE)
             device.wait_until_idle()
 
@@ -101,7 +101,7 @@ class Experiment:
         timeInterval = 0.5
         channel = self.test_channel
         # Move to the solution's coordinates
-        #self.move_to_array(solution)
+        self.move_to_array(solution)
         # Add your code to evaluate the quality of the alignment, e.g., by measuring the average photon count
         avg_photon_count = self.getAvgPhotonCount(timeInterval, channel)
         return avg_photon_count
@@ -113,12 +113,25 @@ class OptimizationAlgorithm(ABC):
         pass
 
 class SimulatedAnnealing(OptimizationAlgorithm):
-    def __init__(self, step_size=1, initial_temperature=1000, cooling_rate=0.95, max_iterations=10000):
+    def __init__(self, experiment, step_size=5, initial_temperature=1000, cooling_rate=0.95, max_iterations=10000, convergence_threshold=0.001, convergence_lookback=5):
         self.step_size = step_size
         self.initial_temperature = initial_temperature
         self.cooling_rate = cooling_rate
         self.max_iterations = max_iterations
+        self.convergence_threshold = convergence_threshold
+        self.convergence_lookback = convergence_lookback
+        self.past_energies = []
 
+    def check_convergence(self):
+        if len(self.past_energies) < self.convergence_lookback:
+            return False
+
+        recent_energies = self.past_energies[-self.convergence_lookback:]
+        min_energy = min(recent_energies)
+        max_energy = max(recent_energies)
+
+        return (max_energy - min_energy) < self.convergence_threshold
+    
     def energy(self, solution, experiment):
         avg_photon_count, _ = experiment.evaluate_solution(solution)
         return avg_photon_count
@@ -154,6 +167,14 @@ class SimulatedAnnealing(OptimizationAlgorithm):
                     best_energy = current_energy
                     best_solution = current_solution
 
+            #Move from 'neighbour' to current solution  
+            experiment.move_to_array(current_solution)
+            self.past_energies.append(current_energy)
+            
+            if self.check_convergence():
+                print("Convergence criteria met. Stopping optimization.")
+                break
+
             temperature *= self.cooling_rate
         
         print("Optimal solution found with average photon count:", best_energy)
@@ -165,13 +186,23 @@ class Controller:
         self.experiment = experiment
         self.algorithm = algorithm
     
-    def run(self):
+    def run(self, experiment):
         optimal_solution = self.algorithm.optimize(self.experiment)
         # Use the optimal solution, e.g., align mirrors accordingly
         print("Optimal solution found:", optimal_solution)
+        experiment.close_motor_connection()
 
 # Example Usage
 experiment = Experiment()
 timeInterval = 0.5
 for i in range(4):
     experiment.run_logic_reading(timeInterval)
+
+# # Initialize experiment and algorithm
+# experiment = Experiment()
+# simulated_annealing_algorithm = SimulatedAnnealing(step_size=5, initial_temperature=1000, cooling_rate=0.95, max_iterations=10000)
+
+# # Create controller and run optimization
+# controller = Controller(experiment, simulated_annealing_algorithm)
+# controller.run()
+
