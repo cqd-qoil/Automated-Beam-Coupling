@@ -4,18 +4,16 @@ Optimisation software for Quantum Optics Lab. Software architecture consists of 
 
 
 ## Project Overview
-This software is used for the optimisation of beam coupling using two Zaber TMM-2 motor mounted mirrors. The software uses a gaussian estimation method to predict the optimal alignment of the 4 axial parameters based off some sampled data and iteratively determines the most optimal alignment for a laser beam based off the power coupling output. 
-
-A second optimisation algorithm was incorporated into the software using SVR supported vector regression which provided faster and more efficient coupling.
+This software is used for the optimisation of beam coupling or using Zaber TMM-2 motor mounted mirrors. The software uses an abstact OptimizationAlgorithm class to allow for Simmulated Annealing, Gaussian Estimation, SVR amongst other methods to predict the optimal alignment parameters for the mirrors based off semi-frequent data sampling. Initially the script was written to optimise power coupling but has now been migrated to maximuse photon count with a Logic16 Counting Card. Future work for the project will be to alter the software for optimization of coincidence detections. 
 
 ## Prerequisites
 ### Software Requiremements
-Ensure you have python installed. You also may need to download National Instruments VISA drivers. Other than that all libraries used are available for download with the `requirements.txt` file.
+Ensure you have python installed. Other than that all libraries used are available for download with the `requirements.txt` file.
 
 ### Hardware Requirements
-The experimental set up for the mirrors requires optionally 1 - 2 Zaber T-MM2 Motor Mounted Mirrors as well as a ThorLabs PM powermeter. The software should be able to autodetect any kind of powermeter so long as it is a PM100 type though it was written using a PM100D. The software also configures the powermeter to for laser wavelengths on 780nm and uses the auto-ranging feature. This value can be changed in the `powerMeterInit()` function of `AutoAlignLib`.
+The experimental set up for the mirrors requires optionally 1 - 2 Zaber T-MM2 Motor Mounted Mirrors as well as a UQDevices Logic16 CC.
 
- A 69mA 750nm laser was used for development of the project. The laser was emmited from a single mode fibre held in place and collimated with a stage. Two ThorLabs BB1-E03 Mirrors were mounted in the Zaber T-MM2 motors and mirror brackets and focused into another stage with attached SMF which fed into the PM100D.
+ A 69mA 750nm laser was used for development of the project, though this will only be relavant to your optics and the algorithm should work the same regardless. The laser was emmited from a single mode fibre held in place and collimated with a stage. Two ThorLabs BB1-E03 Mirrors were mounted in the Zaber T-MM2 motors and mirror brackets and focused into another stage with attached SMF which fed into an APD. The APD is linked into the second channel of the Logic16 which then connects to the conputer along with the Zaber Motors.
 
 ## Installation
 If python is installed and up to date with pip, use 
@@ -52,6 +50,6 @@ Experimental data model examples with 'Database.py' class:
 
 
 ## Contact Information
-If you have any questions or comments about the software, i can be contacted either via email <brendanwallis01@gmail.com>, mobile 0421883516 or [<linkedIn>](<https://www.linkedin.com/in/brendan-wallis-5bb214192/>) 
+If you have any questions or comments about the software, i can be contacted either via email <brendanwallis01@gmail.com>, mobile 0421883516 or [LinkedIn]<https://www.linkedin.com/in/brendan-wallis-5bb214192/>
 
 
