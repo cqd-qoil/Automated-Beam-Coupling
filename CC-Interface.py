@@ -1,5 +1,6 @@
-from abc import ABC, abstractmethod
-
+#######################################################################################################################
+#######################################################################################################################
+#Experiment Libraries
 #Logic16 Libraries
 import sys
 import time
@@ -13,16 +14,23 @@ clr.AddReference('C:\\Users\\lab\\Downloads\\CD V2.35.01\\Applications\\TimeTagE
 from System import Array, Byte, Int64, Int32
 from TimeTag import TTInterface, Logic
 
-#Algorithm Libraries
-import random
-import math
-
 #Zaber Motion Libraries
 import zaber_motion.binary as zmb
 import zaber_motion as zm
-
+#######################################################################################################################
+#######################################################################################################################
+#OptimizationAlgorithm Libraries
+from abc import ABC, abstractmethod
+#Algorithm Libraries
+import random
+import math
+#######################################################################################################################
+#######################################################################################################################
+#Database Libraries
 #Modelling Libraries 
 import matplotlib as plt
+#######################################################################################################################
+#######################################################################################################################
 
 # Experiment Interface
 class Experiment:
@@ -149,7 +157,7 @@ class SimulatedAnnealing(OptimizationAlgorithm):
             return 1.0
         return math.exp((energy_new - energy_old) / temperature)
 
-    def optimize(self, experiment):
+    def optimize(self, experiment, database):
         current_solution = experiment.get_motor_coordinates()  # Initialize with the current positions of the axes
         current_energy = self.energy(current_solution, experiment)
         
@@ -158,12 +166,11 @@ class SimulatedAnnealing(OptimizationAlgorithm):
         
         temperature = self.initial_temperature
 
-        database = Database()
-
         for iteration in range(self.max_iterations):
             neighbor_solution = self.neighbor(current_solution)
             neighbor_energy = self.energy(neighbor_solution, experiment)
             
+            #Debugging Code
             print("\n\nIteration num: ", iteration)
             print("Temperature: ", temperature)
             print("Step Size: ", self.step_size)
@@ -193,21 +200,12 @@ class SimulatedAnnealing(OptimizationAlgorithm):
             temperature *= self.cooling_rate
         
         print("Optimal solution found with average photon count:", best_energy)
-        return best_solution
-
-# Main Controller
-class Controller:
-    def __init__(self, experiment, algorithm):
-        self.experiment = experiment
-        self.algorithm = algorithm
-    
-    def run(self, experiment):
-        optimal_solution = self.algorithm.optimize(self.experiment)
-        # Use the optimal solution, e.g., align mirrors accordingly
-        print("Optimal solution found:", optimal_solution)
-        experiment.close_motor_connection()
+        return best_solution, database
 
 class Database:
+    """
+    Class for tracking data through experiment and modelling when completed
+    """
     def __init__(self):
         self.templist = []
         self.energylist = []
@@ -274,7 +272,7 @@ class Database:
         # display the plot
         plt.show()
     
-    def modelCountVsTime(self, obj_1, obj_2):      
+    def modelCountVsTime(self):      
         """
         Models Photon count achieved vs iteration 
 
@@ -297,19 +295,36 @@ class Database:
         # Show the plot
         plt.show()
 
+# Main Controller
+class Controller:
+    def __init__(self, experiment, algorithm):
+        self.experiment = experiment
+        self.algorithm = algorithm
+        self.database = Database()
+    
+    def run(self, experiment):
+        optimal_solution = self.algorithm.optimize(self.experiment, self.database)
+        # Use the optimal solution, e.g., align mirrors accordingly
+        print("Optimal solution found:", optimal_solution)
+        experiment.close_motor_connection()
+
+    def model(self):
+        self.database.modelCountVsTime()
+        self.database.modelCountVsAxis()
+
 
 # Example Usage
-experiment = Experiment()
-timeInterval = 0.5
-print("Energy: ", experiment.run_logic_reading(timeInterval))
-print("Solution: ",experiment.get_motor_coordinates())
+# experiment = Experiment()
+# timeInterval = 0.5
+# print("Energy: ", experiment.run_logic_reading(timeInterval))
+# print("Solution: ",experiment.get_motor_coordinates())
 
 
 # # Initialize experiment and algorithm
-# experiment = Experiment()
-# simulated_annealing_algorithm = SimulatedAnnealing(experiment)
+experiment = Experiment()
+simulated_annealing_algorithm = SimulatedAnnealing(experiment)
 
-# # Create controller and run optimization
-# controller = Controller(experiment, simulated_annealing_algorithm)
-# controller.run(experiment)
-
+# Create controller and run optimization
+controller = Controller(experiment, simulated_annealing_algorithm)
+controller.run(experiment)
+controller.model()
