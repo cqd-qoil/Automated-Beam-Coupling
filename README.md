@@ -50,6 +50,6 @@ Experimental data model examples with 'Database.py' class:
 
 
 ## Contact Information
-If you have any questions or comments about the software, i can be contacted either via email <brendanwallis01@gmail.com>, mobile 0421883516 or [LinkedIn]<https://www.linkedin.com/in/brendan-wallis-5bb214192/>
+If you have any questions or comments about the software, i can be contacted either via email <brendanwallis01@gmail.com>, mobile 0421883516 or [LinkedIn](https://www.linkedin.com/in/brendan-wallis-5bb214192/)
 
 
