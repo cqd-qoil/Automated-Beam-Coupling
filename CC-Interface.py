@@ -56,7 +56,7 @@ class Experiment:
 
         self.devicelist = 0
 
-        while (len(self.devicelist) < 4):
+        while (len(self.device_list) < 4):
             self.connection = zmb.Connection.open_serial_port('COM3')
             self.device_list = self.connection.detect_devices()
             print("\nConnection open\n")
