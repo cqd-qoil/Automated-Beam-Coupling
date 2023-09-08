@@ -57,6 +57,7 @@ class Experiment:
         self.device_list = self.connection.detect_devices()
         print("\nConnection open\n")
         print("Found {} devices".format(len(self.device_list)))
+        # ADD VALIDATE 4 MOTORS FUNC OR LOOP
 
     def close_motor_connection(self):
         self.connection.close()
@@ -125,6 +126,7 @@ class OptimizationAlgorithm(ABC):
 
 class SimulatedAnnealing(OptimizationAlgorithm):
     def __init__(self, experiment, initial_step_size=200, initial_temperature=1000, cooling_rate=0.95, max_iterations=10000, convergence_threshold=0.001, convergence_lookback=10):
+        self.initial_step_size = initial_step_size
         self.step_size = initial_step_size
         self.initial_temperature = initial_temperature
         self.cooling_rate = cooling_rate
@@ -165,8 +167,6 @@ class SimulatedAnnealing(OptimizationAlgorithm):
         best_energy = current_energy
         
         temperature = self.initial_temperature
-        self.step_size = self.initial_step_size * (temperature / self.initial_temperature)
-
 
         for iteration in range(self.max_iterations):
             neighbor_solution = self.neighbor(current_solution)
@@ -198,6 +198,9 @@ class SimulatedAnnealing(OptimizationAlgorithm):
             if self.check_convergence():
                 print("\nConvergence criteria met. Stopping optimization.")
                 break
+            # Update step size as a function of the temperature.
+            # This line reduces the step size linearly with decreasing temperature.
+            self.step_size = self.initial_step_size * (temperature / self.initial_temperature)
 
             temperature *= self.cooling_rate
         
