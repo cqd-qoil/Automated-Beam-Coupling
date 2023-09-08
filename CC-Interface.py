@@ -53,11 +53,14 @@ class Experiment:
         self.open_motor_connection()
 
     def open_motor_connection(self):
-        self.connection = zmb.Connection.open_serial_port('COM3')
-        self.device_list = self.connection.detect_devices()
-        print("\nConnection open\n")
-        print("Found {} devices".format(len(self.device_list)))
-        # ADD VALIDATE 4 MOTORS FUNC OR LOOP
+
+        self.devicelist = 0
+
+        while (len(self.devicelist) < 4):
+            self.connection = zmb.Connection.open_serial_port('COM3')
+            self.device_list = self.connection.detect_devices()
+            print("\nConnection open\n")
+            print("Found {} devices".format(len(self.device_list)))
 
     def close_motor_connection(self):
         self.connection.close()
@@ -201,7 +204,6 @@ class SimulatedAnnealing(OptimizationAlgorithm):
             # Update step size as a function of the temperature.
             # This line reduces the step size linearly with decreasing temperature.
             self.step_size = self.initial_step_size * (temperature / self.initial_temperature)
-
             temperature *= self.cooling_rate
         
         print("Optimal solution found with average photon count:", best_energy)
@@ -286,7 +288,7 @@ class Database:
         #Plot for energy (coupling) vs solution coordinates
         fig, ax = plt.subplots()
         time = range(len(self.energylist))
-        ax.plot(self.energylist, self.time, color='black')
+        ax.plot(self.energylist, time, color='black')
 
         best_coupling = self.energylist.max()  # Corrected line
         best_coupling_str = str(round(best_coupling, 4))
