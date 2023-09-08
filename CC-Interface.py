@@ -54,7 +54,7 @@ class Experiment:
 
     def open_motor_connection(self):
 
-        self.devicelist = 0
+        self.devicelist = []
 
         while (len(self.device_list) < 4):
             self.connection = zmb.Connection.open_serial_port('COM3')
