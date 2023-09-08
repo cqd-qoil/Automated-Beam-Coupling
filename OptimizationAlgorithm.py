@@ -15,7 +15,7 @@ class OptimizationAlgorithm(ABC):
         pass
 
 class SimulatedAnnealing(OptimizationAlgorithm):
-    def __init__(self, experiment, initial_step_size=400, initial_temperature=1000, cooling_rate=0.95, max_iterations=10000, convergence_threshold=0.001, convergence_lookback=25):
+    def __init__(self, experiment, initial_step_size=150, initial_temperature=1000, cooling_rate=0.98, max_iterations=10000, convergence_threshold=0.001, convergence_lookback=25):
         self.initial_step_size = initial_step_size
         self.step_size = initial_step_size
         self.initial_temperature = initial_temperature
@@ -52,6 +52,7 @@ class SimulatedAnnealing(OptimizationAlgorithm):
     def optimize(self, experiment, database):
         current_solution = experiment.get_motor_coordinates()  # Initialize with the current positions of the axes
         current_energy = self.energy(current_solution, experiment)
+        print("Starting energy at: ", current_energy)
         
         best_solution = current_solution
         best_energy = current_energy
@@ -90,7 +91,7 @@ class SimulatedAnnealing(OptimizationAlgorithm):
                 break
             # Update step size as a function of the temperature.
             # This line reduces the step size linearly with decreasing temperature.
-            self.step_size = self.initial_step_size * ((2 * temperature) / self.initial_temperature)
+            self.step_size = self.initial_step_size * (temperature / (2*self.initial_temperature))
             temperature *= self.cooling_rate
         
         print("Optimal solution found with average photon count:", best_energy)
