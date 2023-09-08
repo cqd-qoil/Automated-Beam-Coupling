@@ -15,7 +15,7 @@ class OptimizationAlgorithm(ABC):
         pass
 
 class SimulatedAnnealing(OptimizationAlgorithm):
-    def __init__(self, experiment, initial_step_size=200, initial_temperature=1000, cooling_rate=0.95, max_iterations=10000, convergence_threshold=0.001, convergence_lookback=25):
+    def __init__(self, experiment, initial_step_size=400, initial_temperature=1000, cooling_rate=0.95, max_iterations=10000, convergence_threshold=0.001, convergence_lookback=25):
         self.initial_step_size = initial_step_size
         self.step_size = initial_step_size
         self.initial_temperature = initial_temperature
