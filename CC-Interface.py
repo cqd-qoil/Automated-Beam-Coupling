@@ -28,7 +28,7 @@ import math
 #######################################################################################################################
 #Database Libraries
 #Modelling Libraries 
-import matplotlib as plt
+import matplotlib.pyplot as plt
 #######################################################################################################################
 #######################################################################################################################
 
@@ -124,8 +124,8 @@ class OptimizationAlgorithm(ABC):
         pass
 
 class SimulatedAnnealing(OptimizationAlgorithm):
-    def __init__(self, experiment, step_size=200, initial_temperature=1000, cooling_rate=0.95, max_iterations=10000, convergence_threshold=0.001, convergence_lookback=10):
-        self.step_size = step_size
+    def __init__(self, experiment, initial_step_size=200, initial_temperature=1000, cooling_rate=0.95, max_iterations=10000, convergence_threshold=0.001, convergence_lookback=10):
+        self.step_size = initial_step_size
         self.initial_temperature = initial_temperature
         self.cooling_rate = cooling_rate
         self.max_iterations = max_iterations
@@ -165,6 +165,8 @@ class SimulatedAnnealing(OptimizationAlgorithm):
         best_energy = current_energy
         
         temperature = self.initial_temperature
+        self.step_size = self.initial_step_size * (temperature / self.initial_temperature)
+
 
         for iteration in range(self.max_iterations):
             neighbor_solution = self.neighbor(current_solution)
