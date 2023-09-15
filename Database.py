@@ -61,30 +61,30 @@ class Database:
 
         # scatter plot x0 against p0
         axs[0, 0].scatter(x1_steps, self.energylist, color='black')
-        axs[0, 0].set_title('x1 vs p0')
+        axs[0, 0].set_title('x1 vs Count')
 
         # scatter plot x0 against p1
         axs[0, 1].scatter(y1_steps, self.energylist, color='black')
-        axs[0, 1].set_title('y1 vs p0')
+        axs[0, 1].set_title('y1 vs Count')
 
         # scatter plot x1 against p0
         axs[1, 0].scatter(x2_steps, self.energylist, color='black')
-        axs[1, 0].set_title('x2 vs p0')
+        axs[1, 0].set_title('x2 vs Count')
 
         # scatter plot x1 against p1
         axs[1, 1].scatter(y2_steps, self.energylist, color='black')
-        axs[1, 1].set_title('y1 vs p0')
+        axs[1, 1].set_title('y2 vs Count')
 
         # adjust spacing between subplots
         plt.subplots_adjust(wspace=0.3, hspace=0.5)
 
         # add caption to the figure
-        fig.text(0.5, 0.01, 'Subplots representing each axis coordinate vs Normalised Photon Counts (#).', ha='center')
+        fig.text(0.5, 0.01, 'Axis coordinate vs Normalised Photon Counts (#).', ha='center')
 
         # display the plot
         plt.show()
     
-    def modelCountVsTime(self):      
+    def modelBestCountVsTime(self):      
         """
         Models Photon count achieved vs iteration 
 
@@ -98,7 +98,7 @@ class Database:
         best_coupling = max(self.energylist)  # Corrected line
         best_coupling_str = str(round(best_coupling, 4))
 
-        ax.set_title('Coupling achieved using optimization algorithm vs Solution Coordinates (steps)')
+        ax.set_title('Coupling vs Optimsation iteration (steps)')
         ax.set_xlabel('Time [Iteration #]')
         ax.set_ylabel('Normalised Photon Counts [#]')
         caption = '\n\n\n\nConvergence is achieved at a coupling of ' + best_coupling_str + ' counts.'

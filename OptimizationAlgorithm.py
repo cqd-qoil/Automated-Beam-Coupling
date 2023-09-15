@@ -30,6 +30,8 @@ class SimulatedAnnealing(OptimizationAlgorithm):
             return False
 
         recent_energies = self.past_energies[-self.convergence_lookback:]
+        print("Recent Energies: ")
+        enumerate(recent_energies)
         min_energy = min(recent_energies)
         max_energy = max(recent_energies)
 
@@ -40,7 +42,6 @@ class SimulatedAnnealing(OptimizationAlgorithm):
         return avg_photon_count
 
     def neighbor(self, solution):
-        # Generate a neighboring solution by adjusting each axis by a small random step
         new_solution = [axis + random.uniform(-self.step_size, self.step_size) for axis in solution]
         return new_solution
 
@@ -72,10 +73,15 @@ class SimulatedAnnealing(OptimizationAlgorithm):
             print("Neighbour Solution: ", neighbor_solution)
             print("Neighbour Energy: ", neighbor_energy)
 
+            print("Acceptance Probability: ")
+            print(self.acceptance_probability(current_energy, neighbor_energy, temperature))
             
             if self.acceptance_probability(current_energy, neighbor_energy, temperature) > random.random():
+                print("Accepted")
                 current_solution = neighbor_solution
                 current_energy = neighbor_energy
+            else:
+                print("Not accepted")
 
                 if current_energy > best_energy:
                     best_energy = current_energy
@@ -83,13 +89,15 @@ class SimulatedAnnealing(OptimizationAlgorithm):
 
             #Move from 'neighbour' to current solution  
             experiment.move_to_array(current_solution)
+
+            #Add stats to database
             self.past_energies.append(current_energy)
             database.addData(temperature, current_energy, current_solution)
             
             if self.check_convergence():
                 print("\nConvergence criteria met. Stopping optimization.")
                 break
-            # Update step size as a function of the temperature.
+            # Update step size as a function of the temperature?
             # This line reduces the step size linearly with decreasing temperature.
             self.step_size = self.initial_step_size * (temperature / (2*self.initial_temperature))
             temperature *= self.cooling_rate
