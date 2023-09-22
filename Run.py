@@ -5,7 +5,7 @@ import Controller
 
 # # Initialize experiment and algorithm
 experiment = Experiment.Experiment()
-simulated_annealing_algorithm = OptimizationAlgorithm.SciPiSimAnneal(experiment)
+simulated_annealing_algorithm = OptimizationAlgorithm.SciPySimAnneal(experiment)
 
 # Create controller and run optimization
 controller = Controller.Controller(experiment, simulated_annealing_algorithm)

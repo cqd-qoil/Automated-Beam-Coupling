@@ -17,6 +17,6 @@ class Controller:
         self.database.print()
         self.database.modelCountVsTime()
         self.database.modelCountVsAxis()
-        self.database.modelTimeVsAxis()
+        #self.database.modelTimeVsAxis()
         
 
