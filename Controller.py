@@ -10,11 +10,13 @@ class Controller:
     def run(self, experiment):
         optimal_solution = self.algorithm.optimize(self.experiment, self.database)
         # Use the optimal solution, e.g., align mirrors accordingly
-        print("Optimal solution found:", optimal_solution)
+        print("Optimal solution found at:", optimal_solution)
         experiment.close_motor_connection()
 
     def model(self):
         self.database.print()
         self.database.modelCountVsTime()
         self.database.modelCountVsAxis()
+        self.database.modelTimeVsAxis()
+        
 
