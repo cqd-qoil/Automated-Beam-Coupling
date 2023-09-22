@@ -38,6 +38,7 @@ class SciPySimAnneal(OptimizationAlgorithm):
         return ((max_energy - min_energy) / (max_energy + min_energy)) < self.convergence_threshold
 
     def energy(self, solution, experiment):
+        experiment.move_to_array(solution)  # Move the motors to the new solution coordinates
         avg_photon_count, _ = experiment.evaluate_solution(solution)
         return avg_photon_count
 
