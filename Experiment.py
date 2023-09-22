@@ -80,12 +80,6 @@ class Experiment:
         delta_t=(TimeCounter1)*5e-9
         return counts, delta_t
 
-    def printData(self, counts, delta_t, k):
-        delta_t_text = "\n Delta-T [s] = %.4f, " %(delta_t)
-        counter_text = "\n Ch%d Counts per %.2f [S] Interval = %d," %(k,timeInterval,counts)
-        freq_text = "\n Normalised Counts per S = %.2f, " %(counts/delta_t)
-        print(delta_t_text +counter_text + freq_text)
-
     def getAvgPhotonCount(self, timeInterval, channel):
         counts_list = []
         num_counts = 10
