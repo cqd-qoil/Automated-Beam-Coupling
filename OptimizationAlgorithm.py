@@ -48,7 +48,9 @@ class SimulatedAnnealing(OptimizationAlgorithm):
     def acceptance_probability(self, energy_old, energy_new, temperature):
         if energy_new > energy_old:
             return 1.0
-        return math.exp((energy_new - energy_old) / temperature)
+        prob = math.exp((energy_old - energy_new) / 100 * temperature)
+        print("\n\nAcceptance Probability: ", prob)
+        return prob
 
     def optimize(self, experiment, database):
         current_solution = experiment.get_motor_coordinates()  # Initialize with the current positions of the axes
@@ -72,9 +74,6 @@ class SimulatedAnnealing(OptimizationAlgorithm):
             print("Current Energy: ", current_energy)
             print("Neighbour Solution: ", neighbor_solution)
             print("Neighbour Energy: ", neighbor_energy)
-
-            print("Acceptance Probability: ")
-            print(self.acceptance_probability(current_energy, neighbor_energy, temperature))
             
             if self.acceptance_probability(current_energy, neighbor_energy, temperature) > random.random():
                 print("Accepted")
@@ -102,5 +101,5 @@ class SimulatedAnnealing(OptimizationAlgorithm):
             self.step_size = self.initial_step_size * (temperature / (2*self.initial_temperature))
             temperature *= self.cooling_rate
         
-        print("Optimal solution found with average photon count:", best_energy)
+        print("\n\nOptimal solution found with average photon count:", best_energy)
         return best_solution, database
