@@ -7,12 +7,51 @@ import random
 import math
 #######################################################################################################################
 #######################################################################################################################
+from scipy.optimize import basinhopping
+import random
+import math
+
 
 # Optimization Algorithm Interface
 class OptimizationAlgorithm(ABC):
     @abstractmethod
     def optimize(self, experiment):
         pass
+
+class SciPiSimAnneal(OptimizationAlgorithm):
+    def __init__(self, initial_step_size=150, max_iterations=10000, initial_temperature=1000):
+        self.initial_step_size = initial_step_size
+        self.max_iterations = max_iterations
+        self.initial_temperature = initial_temperature
+
+    @staticmethod
+    def energy(solution, experiment):
+        avg_photon_count, _ = experiment.evaluate_solution(solution)
+        return avg_photon_count
+
+    @staticmethod
+    def take_step(solution):
+        step_size = 150  # You can make this an instance variable if you'd like
+        new_solution = [axis + random.uniform(-step_size, step_size) for axis in solution]
+        return new_solution
+
+    def optimize(self, experiment):
+        # Initialize the starting solution.
+        initial_solution = experiment.get_motor_coordinates()
+
+        # Set up the minimizer_kwargs
+        minimizer_kwargs = {"args": (experiment,)}
+
+        # Perform optimization
+        ret = basinhopping(self.energy, initial_solution, minimizer_kwargs=minimizer_kwargs, 
+                           take_step=self.take_step, niter=self.max_iterations, T=self.initial_temperature, 
+                           stepsize=self.initial_step_size)
+
+        # Get the results
+        best_solution = ret.x
+        best_energy = ret.fun
+
+        return best_solution, best_energy
 
 class SimulatedAnnealing(OptimizationAlgorithm):
     def __init__(self, experiment, initial_step_size=150, initial_temperature=1000, cooling_rate=0.98, max_iterations=10000, convergence_threshold=0.001, convergence_lookback=25):
