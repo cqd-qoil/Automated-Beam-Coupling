@@ -84,7 +84,7 @@ class Database:
         # display the plot
         plt.show()
     
-    def modelBestCountVsTime(self):      
+    def modelCountVsTime(self):      
         """
         Models Photon count achieved vs iteration 
 
@@ -105,4 +105,53 @@ class Database:
         ax.text(0.5, -0.1, caption, ha='center', va='center', transform=ax.transAxes)
 
         # Show the plot
+        plt.show()
+
+def modelTimeVsAxis(self):
+        """
+        Models Photon count vs Solution steps 
+
+        Takes no inputs
+        """
+        #get each axis steps list 
+        x1_steps = []
+        y1_steps = []
+        x2_steps = []
+        y2_steps = []
+
+        time = range(len(self.solutions))
+
+        for i in range(len(self.solutions)):
+            # extract data from solutions list
+            x1_steps.append(self.solutions[i][0])
+            y1_steps.append(self.solutions[i][1])
+            x2_steps.append(self.solutions[i][2])
+            y2_steps.append(self.solutions[i][3])
+
+        # create subplots
+        fig, axs = plt.subplots(2, 2)
+
+        # scatter plot x0 against p0
+        axs[0, 0].scatter( time, x1_steps, color='black')
+        axs[0, 0].set_title('x1 vs Time')
+
+        # scatter plot x0 against p1
+        axs[0, 1].scatter( time, y1_steps,color='black')
+        axs[0, 1].set_title('y1 vs Time')
+
+        # scatter plot x1 against p0
+        axs[1, 0].scatter( time, x2_steps,color='black')
+        axs[1, 0].set_title('x2 vs Time')
+
+        # scatter plot x1 against p1
+        axs[1, 1].scatter(time,y2_steps, color='black')
+        axs[1, 1].set_title('y2 vs Time')
+
+        # adjust spacing between subplots
+        plt.subplots_adjust(wspace=0.3, hspace=0.5)
+
+        # add caption to the figure
+        fig.text(0.5, 0.01, 'Axis coordinate vs Normalised Photon Counts (#).', ha='center')
+
+        # display the plot
         plt.show()
