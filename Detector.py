@@ -16,14 +16,15 @@ from TimeTag import TTInterface, Logic
 
 class Detector:
     @abstractmethod
-    def read(self, solution):
+    def read(self):
         pass
 
 class PowerMeter(Detector):
-    def init(self):
+    def init(self, COM_port):
         self.solution = 0
+        self.address = COM_port
         pass
-    def read(self, solution):
+    def read(self):
         pass
 
 class Logic16(Detector):
@@ -49,10 +50,14 @@ class Logic16(Detector):
         TimeCounter1 = self.MyLogic.GetTimeCounter()
 
     def readCounts(self, timeInterval, channel):
+        #Let Logic16 collect data for timeInterval [s]
         time.sleep(timeInterval)
+        #Read count off logic
         self.MyLogic.ReadLogic()
+        #Get exact time of collection
         TimeCounter1 = self.MyLogic.GetTimeCounter()
         counts=self.MyLogic.CalcCountPos(2**(channel-1))
+        #Normalise counts to 1 second
         delta_t=(TimeCounter1)*5e-9
         return counts, delta_t
 
@@ -66,6 +71,6 @@ class Logic16(Detector):
         counts_avg = sum(counts_list) / len(counts_list)
         return counts_avg, delta_t
 
-    def evaluate_solution(self):
+    def read(self):
         avg_photon_count = self.getAvgPhotonCount(self.timeInterval, self.channel)
         return avg_photon_count
