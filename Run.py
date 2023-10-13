@@ -5,9 +5,9 @@ import Controller
 
 # # Initialize experiment and algorithm
 experiment = Experiment.Experiment()
-simulated_annealing_algorithm = OptimizationAlgorithm.SciPySimAnneal(experiment)
+basin_hopping_result = OptimizationAlgorithm.BasinHopping(experiment)
 
 # Create controller and run optimization
-controller = Controller.Controller(experiment, simulated_annealing_algorithm)
+controller = Controller.Controller(experiment, basin_hopping_result)
 controller.run(experiment)
 controller.model()
