@@ -18,6 +18,35 @@ class OptimizationAlgorithm(ABC):
     def optimize(self, experiment):
         pass
 
+class BasinHopping(OptimizationAlgorithm):
+    def __init__(self, experiment):
+        self.experiment = experiment
+        self.solution = self.x0()
+
+    def objective(self):
+        #Objective Function for Optimization
+        avg_photon_count, _ = self.experiment.evaluate_solution(self.solution)
+        return -1 * avg_photon_count
+    
+    def x0(self):
+        return self.experiment.get_motor_coordinates()
+    
+    def take_step(self):
+        new_solution = [axis + random.uniform(-self.initial_step_size, self.initial_step_size) for axis in self.solution]
+        self.experiment.move_to_array(new_solution)
+        self.solution = new_solution
+        return new_solution
+
+    def callback(self):
+        #Append List here
+        pass
+
+    def optimize(self):
+        return basinhopping(func=lambda: self.objective(), x0=lambda: self.x0(), niter=1000, T=1, stepsize=20,
+                            minimizer_kwargs=None, interval=50, disp=True, niter_success=20, seed=None,
+                            target_accept_rate=0.5, stepwise_factor=0.9)
+        
+
 class SciPySimAnneal(OptimizationAlgorithm):
     def __init__(self, initial_step_size=150, max_iterations=10000, initial_temperature=1000, convergence_threshold=0.001, convergence_lookback=25):
         self.initial_step_size = initial_step_size
