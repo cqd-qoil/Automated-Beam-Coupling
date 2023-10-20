@@ -25,16 +25,13 @@ class Detector:
         pass
 
 class PowerMeter(Detector):
-    def init(self, COM_port):
-        #Parameter shoudl be connection method COM or USB
-
-        self.solution = 0
-        self.address = self.get_power_meter_adress(COM_port)
+    def __init__(self, device_name):
+        self.address = self.get_power_meter_address(device_name)
         self.pm = self.power_meter_init(780)
 
-    def get_power_meter_address(device_name):
+    def get_power_meter_address(self, device_name):
         """
-        Takes connection_method argument ('USB' or 'COM') and optionally COM_port='COM#' if using COM
+        Takes device_name searches in return address in visa resources if it exists
         """
         rm = visa.ResourceManager()
         pm_addr = None
@@ -43,7 +40,7 @@ class PowerMeter(Detector):
             try:
                 inst = rm.open_resource(item)
                 idn = inst.query('*IDN?').strip()
-                print("VISA Resource: {item}, IDN: {idn}")  # Print information about detected devices
+                print("\nVISA Resource: ",item, ", IDN: ",idn)  # Print information about detected devices
                 if device_name in idn:  # Search for device model 
                     pm_addr = item
                     break
@@ -51,7 +48,7 @@ class PowerMeter(Detector):
                 print(f"Error querying VISA resource {item}: {e}")
 
         if pm_addr:
-            print("Power meter VISA address: {pm_addr}")
+            print("Power meter VISA address: ", pm_addr, "\n")
             return pm_addr
         else:
             print("Power meter not found.")
@@ -65,7 +62,7 @@ class PowerMeter(Detector):
         if self.address != 0:
             inst = rm.open_resource(self.address)
 
-            power_meter = ThorlabsPM100.ThorlabsPM100(inst=inst)
+            power_meter = ThorlabsPM100(inst=inst)
             power_meter.configure.scalar.power()
 
             #Configure device wavelength param wavelength otherwise default to 780
