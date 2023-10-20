@@ -26,24 +26,45 @@ class Detector:
 
 class PowerMeter(Detector):
     def init(self, COM_port):
+        #Parameter shoudl be connection method COM or USB
+
         self.solution = 0
         self.address = self.get_power_meter_adress(COM_port)
         self.pm = self.power_meter_init(780)
 
-    def get_power_meter_address(COM_port):
+    def get_power_meter_address(connection_method, COM_port=None):
+        """
+        Takes connection_method argument ('USB' or 'COM') and optionally COM_port='COM#' if using COM
+        """
         rm = visa.ResourceManager()
         pm_addr = None
-
-        full_COM_address = f"ASRL{COM_port}::INSTR"
         
+        # Dictionary for different connection methods and their address formats
+        address_formats = {
+            'USB': 'USB0::0x0000::0x0000::0::INSTR',
+            'COM': f'ASRL{COM_port}::INSTR'
+        }
+        
+        # Get the corresponding address format
+        address = address_formats.get(connection_method)
+        
+        if address is None:
+            print(f"Invalid connection method: {connection_method}")
+            return None
+        
+        if 'COM' in connection_method and COM_port is not None:
+            address = address.format(COM_port=COM_port)
+
         try:
-            inst = rm.open_resource(full_COM_address)
+            inst = rm.open_resource(address)
             idn = inst.query('*IDN?').strip()
-            print(f"VISA Resource: {full_COM_address}, IDN: {idn}")  # Print information about detected device
-            if 'PM100D' in idn:  
-                return full_COM_address
+            print(f"VISA Resource: {address}, IDN: {idn}")  # Print information about detected device
+            if 'PM100D' in idn:  # Replace 'PM100D' with the specific model of your power meter
+                return address
         except Exception as e:
-            print(f"Error querying VISA resource {full_COM_address}: {e}")
+            print(f"Error querying VISA resource {address}: {e}")
+            print("Power meter not found.")
+            return None
 
     def power_meter_init(self, wv):
         """
