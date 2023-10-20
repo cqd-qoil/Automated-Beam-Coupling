@@ -5,10 +5,9 @@ import zaber_motion as zm
 class ZaberMotor:
     def __init__(self):
         self.open_motor_connection()
+        self.device_list = []
         
     def open_motor_connection(self):
-        self.device_list = []
-
         while (len(self.device_list) < 4):
             self.connection = zmb.Connection.open_serial_port('COM3')
             self.device_list = self.connection.detect_devices()
