@@ -40,7 +40,7 @@ class BasinHopping(OptimizationAlgorithm):
 
     def callback(self):
         #Append List here
-        self.database.addData( , self.solution)
+        #self.database.addData( , self.solution)
         pass
 
     def optimize(self):
