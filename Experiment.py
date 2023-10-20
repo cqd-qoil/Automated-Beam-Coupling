@@ -7,9 +7,9 @@ class Experiment:
         #Detector Initialisation
         # self.detector = Detector.Logic16
         #Output Detector
-        self.detector1 =Detector.PowerMeter('COM3')
+        self.detector1 = Detector.PowerMeter('PM100D')
         #Split Beam Detector
-        self.detector2 =Detector.PowerMeter('COM4')
+        self.detector2 = Detector.PowerMeter('PM16')
 
         #Motor initialisation
         self.motors = ZaberMotor.ZaberMotor
