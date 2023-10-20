@@ -11,19 +11,16 @@ class Database:
     Class for tracking data through experiment and modelling when completed
     """
     def __init__(self):
-        self.templist = []
-        self.energylist = []
+        self.countlist = []
         self.solutions = []
 
-    def addData(self, temp, energy, solution):
-        self.addtemp(temp)
-        self.addenergy(energy)
+    def addData(self, count, solution):
+        self.addcount(count)
         self.addsolution(solution)
 
-    def addtemp(self, temp):
-        self.templist.append(temp)
-    def addenergy(self, energy):
-        self.energylist.append(energy)
+    def addcount(self, count):
+        self.countlist.append(count)
+
     def addsolution(self, solution):
         self.solutions.append(solution)
 
@@ -31,11 +28,8 @@ class Database:
         for i in range(len(self.solutions)):
             print("Solution: ", i, self.solutions[i])
 
-        for i in range(len(self.energylist)):
-            print("Energy: ", i, self.energylist[i])
-
-        for i in range(len(self.templist)):
-            print("Temp: ", i, self.templist[i])
+        for i in range(len(self.countlist)):
+            print("Count: ", i, self.countlist[i])
 
     def modelCountVsAxis(self):
         """
@@ -92,10 +86,10 @@ class Database:
         """       
         #Plot for energy (coupling) vs solution coordinates
         fig, ax = plt.subplots()
-        time = range(len(self.energylist))
-        ax.plot(time, self.energylist, color='black')
+        time = range(len(self.countlist))
+        ax.plot(time, self.countlist, color='black')
 
-        best_coupling = max(self.energylist)  # Corrected line
+        best_coupling = max(self.countlist)  # Corrected line
         best_coupling_str = str(round(best_coupling, 4))
 
         ax.set_title('Coupling vs Optimsation iteration (steps)')
