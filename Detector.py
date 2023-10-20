@@ -14,6 +14,11 @@ clr.AddReference('C:\\Users\\lab\\Downloads\\CD V2.35.01\\Applications\\TimeTagE
 from System import Array, Byte, Int64, Int32
 from TimeTag import TTInterface, Logic
 
+#PM Library
+import pyvisa as visa
+from ThorlabsPM100 import ThorlabsPM100
+import numpy as np
+
 class Detector:
     @abstractmethod
     def read(self):
@@ -22,10 +27,56 @@ class Detector:
 class PowerMeter(Detector):
     def init(self, COM_port):
         self.solution = 0
-        self.address = COM_port
-        pass
+        self.address = self.get_power_meter_adress(COM_port)
+        self.pm = self.power_meter_init(780)
+
+    def get_power_meter_address(COM_port):
+        rm = visa.ResourceManager()
+        pm_addr = None
+
+        full_COM_address = f"ASRL{COM_port}::INSTR"
+        
+        try:
+            inst = rm.open_resource(full_COM_address)
+            idn = inst.query('*IDN?').strip()
+            print(f"VISA Resource: {full_COM_address}, IDN: {idn}")  # Print information about detected device
+            if 'PM100D' in idn:  
+                return full_COM_address
+        except Exception as e:
+            print(f"Error querying VISA resource {full_COM_address}: {e}")
+
+    def power_meter_init(self, wv):
+        """
+        Function initialises power meter COMPORT and configures PM returns pm object or none if not found 
+        """
+        rm = visa.ResourceManager()
+        if self.address != 0:
+            inst = rm.open_resource(self.address)
+
+            power_meter = ThorlabsPM100.ThorlabsPM100(inst=inst)
+            power_meter.configure.scalar.power()
+
+            #Configure device wavelength param wavelength otherwise default to 780
+            power_meter.sense.correction.wavelength = 780
+
+            return power_meter
+        else:
+            print("power meter address not found")
+            return None 
+        
     def read(self):
-        pass
+        """
+        Function to sample power reading off power meter. Samples n measurements 
+        then returns avg power and standard deviation in power
+
+        Input: 
+        Output: pMean: Avg power over n interval, pStd: Standard deviation in measurement
+        """
+        power_samples = 30
+        power = np.array([self.pm.read for i in range(power_samples)])
+        pMean = power.mean()
+        pStd = power.std()
+        return pMean, pStd
 
 class Logic16(Detector):
     def __init__(self):
@@ -50,6 +101,9 @@ class Logic16(Detector):
         TimeCounter1 = self.MyLogic.GetTimeCounter()
 
     def readCounts(self, timeInterval, channel):
+        """
+        Reads Counts for time interval
+        """
         #Let Logic16 collect data for timeInterval [s]
         time.sleep(timeInterval)
         #Read count off logic
@@ -62,6 +116,9 @@ class Logic16(Detector):
         return counts, delta_t
 
     def getAvgPhotonCount(self, timeInterval, channel):
+        """
+        Performs 10 counts over timeInterval then returns avg result
+        """
         counts_list = []
         num_counts = 10
         for i in range(1, num_counts):
