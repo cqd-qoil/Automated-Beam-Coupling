@@ -6,8 +6,10 @@ class Experiment:
     def __init__(self):
         #Detector Initialisation
         # self.detector = Detector.Logic16
-        self.detector1 =Detector.PowerMeter()
-        self.detector2 =Detector.PowerMeter()
+        #Output Detector
+        self.detector1 =Detector.PowerMeter('COM3')
+        #Split Beam Detector
+        self.detector2 =Detector.PowerMeter('COM4')
 
         #Motor initialisation
         self.motors = ZaberMotor.ZaberMotor
@@ -28,5 +30,5 @@ class Experiment:
     
     def benchmark(self):
         #Theoretical maximum pairing based off heralded detector split ration + filtering aspect
-        p_opt = (1.185/4.640) * self.detector2.read() * self.filtering_coefficient
+        p_opt = (1.185/4.640) * self.detector2.read() #* self.filtering_coefficient
         return self.detector1.read()/p_opt
