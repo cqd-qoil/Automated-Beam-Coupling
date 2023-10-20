@@ -27,8 +27,7 @@ def get_power_meter_address(connection_method, COM_port=None):
         inst = rm.open_resource(address)
         idn = inst.query('*IDN?').strip()
         print(f"VISA Resource: {address}, IDN: {idn}")  # Print information about detected device
-        if 'PM100D' in idn:  # Replace 'PM100D' with the specific model of your power meter
-            return address
+        return address
     except Exception as e:
         print(f"Error querying VISA resource {address}: {e}")
         print("Power meter not found.")
