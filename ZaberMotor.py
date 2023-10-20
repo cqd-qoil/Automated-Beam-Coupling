@@ -7,7 +7,6 @@ class ZaberMotor:
         self.open_motor_connection()
         
     def open_motor_connection(self):
-
         self.device_list = []
 
         while (len(self.device_list) < 4):
