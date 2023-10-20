@@ -23,11 +23,12 @@ class BasinHopping(OptimizationAlgorithm):
         self.experiment = experiment
         self.solution = self.x0()
         self.database = database
+        self.count = self.objective()
 
     def objective(self):
         #Objective Function for Optimization
-        avg_photon_count, _ = self.experiment.evaluate_solution(self.solution)
-        return -1 * avg_photon_count
+        self.count, _ = self.experiment.evaluate_solution(self.solution)
+        return -1 * self.count
     
     def x0(self):
         return self.experiment.get_motor_coordinates()
@@ -40,7 +41,7 @@ class BasinHopping(OptimizationAlgorithm):
 
     def callback(self):
         #Append List here
-        #self.database.addData( , self.solution)
+        self.database.addData(self.count, self.solution)
         pass
 
     def optimize(self):
