@@ -12,6 +12,7 @@ class Controller:
         # Use the optimal solution, e.g., align mirrors accordingly
         print("Optimal solution found at:", optimal_solution)
         experiment.close_motor_connection()
+        print("Optimal solution should be: ", self.experiment.benchmark())
 
     def model(self):
         self.database.print()
