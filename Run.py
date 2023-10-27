@@ -2,10 +2,12 @@
 from Experiment import Experiment
 import OptimizationAlgorithm
 import Controller
+from Database import Database
 
 # # Initialize experiment and algorithm
-experiment = Experiment()
-basin_hopping_result = OptimizationAlgorithm.BasinHopping(experiment, )
+experiment = Experiment.Experiment()
+database = Database()
+basin_hopping_result = OptimizationAlgorithm.BasinHopping(experiment, database)
 
 # Create controller and run optimization
 controller = Controller.Controller(experiment, basin_hopping_result)
