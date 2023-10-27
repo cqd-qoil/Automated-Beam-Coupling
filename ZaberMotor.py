@@ -4,8 +4,8 @@ import zaber_motion as zm
 
 class ZaberMotor:
     def __init__(self):
-        self.open_motor_connection()
         self.device_list = []
+        self.open_motor_connection()
         
     def open_motor_connection(self):
         while (len(self.device_list) < 4):
