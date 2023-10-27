@@ -12,7 +12,7 @@ class Experiment:
         self.detector2 = Detector.PowerMeter('PM16')
 
         #Motor initialisation
-        self.motors = ZaberMotor.ZaberMotor
+        self.motors = ZaberMotor.ZaberMotor()
         self.motors.open_motor_connection()
 
         #Variable Initialisation
