@@ -5,7 +5,7 @@ import Controller
 from Database import Database
 
 # # Initialize experiment and algorithm
-experiment = Experiment.Experiment()
+experiment = Experiment()
 database = Database()
 basin_hopping_result = OptimizationAlgorithm.BasinHopping(experiment, database)
 
