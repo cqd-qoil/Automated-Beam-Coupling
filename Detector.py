@@ -31,7 +31,9 @@ class PowerMeter(Detector):
 
     def get_power_meter_address(self, device_name):
         """
-        Takes device_name searches in return address in visa resources if it exists
+        Takes device name argument and returns address if it exists
+
+        Sometimes the registered name may vary from the actual name to list all connected device names run list_all_addresses()
         """
         rm = visa.ResourceManager()
         pm_addr = None
@@ -53,6 +55,22 @@ class PowerMeter(Detector):
         else:
             print("Power meter not found.")
             return 0
+        
+    def list_all_addresses(device_name):
+        """
+        Takes device name argument and searches through resources for it
+        Sometimes the registered name may vary from the actual name to list all connected device names run XXXX
+        """
+        rm = visa.ResourceManager()
+        pm_addr = None
+
+        for item in rm.list_resources():
+            try:
+                inst = rm.open_resource(item)
+                idn = inst.query('*IDN?').strip()
+                print("\nVISA Resource: ",item, ", IDN: ",idn)  # Print information about detected devices
+            except Exception as e:
+                print(f"Error querying VISA resource {item}: {e}")
 
     def power_meter_init(self, wv):
         """
