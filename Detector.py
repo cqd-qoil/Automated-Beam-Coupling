@@ -50,7 +50,7 @@ class PowerMeter(Detector):
                 print(f"Error querying VISA resource {item}: {e}")
 
         if pm_addr:
-            print("Power meter VISA address: ", pm_addr, "\n")
+            print("Power meter VISA address: ", pm_addr)
             return pm_addr
         else:
             print("Power meter not found.")
@@ -103,7 +103,7 @@ class PowerMeter(Detector):
         power = np.array([self.pm.read for i in range(power_samples)])
         pMean = power.mean()
         pStd = power.std()
-        return pMean, pStd
+        return pMean
 
 class Logic16(Detector):
     def __init__(self):
