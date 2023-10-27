@@ -6,6 +6,7 @@ class ZaberMotor:
     def __init__(self):
         self.device_list = []
         self.open_motor_connection()
+        # self.reset_motor_axis(324)
         
     def open_motor_connection(self):
         while (len(self.device_list) < 4):
@@ -17,6 +18,13 @@ class ZaberMotor:
     def close_motor_connection(self):
         self.connection.close()
         print("Connection closed")
+
+    def reset_motor_axis(self):
+        """
+        Notes current coordinates, homes all axis then returns to starting
+        Sometimes axis get blocked at half way this resets them
+        """
+        pass
 
     def get_motor_coordinates(self):
         current_coords = []
