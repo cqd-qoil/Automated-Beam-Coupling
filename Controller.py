@@ -5,10 +5,9 @@ class Controller:
     def __init__(self, experiment, algorithm):
         self.experiment = experiment
         self.algorithm = algorithm
-        self.database = Database.Database()
     
     def run(self, experiment):
-        optimal_solution = self.algorithm.optimize(self.experiment, self.database)
+        optimal_solution = self.algorithm.optimize(self.experiment)
         # Use the optimal solution, e.g., align mirrors accordingly
         print("Optimal solution found at:", optimal_solution)
         experiment.close_motor_connection()
