@@ -11,6 +11,9 @@ from scipy.optimize import basinhopping
 import random
 import math
 import numpy as np
+from functools import partial
+
+##CREATE OPT GRAPH WITH EACH OPT METHOD
 
 
 # Optimization Algorithm Interface
@@ -19,51 +22,70 @@ class OptimizationAlgorithm(ABC):
     def optimize(self, experiment):
         pass
 
+class opt():
+    def __init__(self, experiment):
+        # Output Detector
+        self.detector1 = experiment.detector1
+        # Motor initialization
+        self.motors = experiment.motors
+
+    def objective(self, x):
+        # motors.move_to_array will return 1 when motors finished moving
+        while not self.motors.move_to_array(x):
+            pass
+        count = self.detector1.read()
+        if count < 0:
+            count = 0
+        # print("count: ", count)
+        return -1*count
+
 class BasinHopping(OptimizationAlgorithm):
     def __init__(self, experiment, database):
         self.experiment = experiment
-        self.solution = self.x0()
+        self.stepsize = 100
+        self.niters = 4
         self.database = database
-        self.count = self.experiment.evaluate_solution(self.solution)
-        self.step_size = 50
 
-    # def update(self):
-    #     self.solution = 
-    #     self.x0 = 
-    # def objective(self):
-    #     #Objective Function for Optimization
-    #     self.count = self.experiment.evaluate_solution(self.solution)
-    #     return -1*self.count
-    def objective(self,coords):
-    #Objective Function for Optimization
-        # self.update()
-        return -1*self.experiment.evaluate_solution(coords) 
-    
-    def x0(self):
-        return self.experiment.get_motor_coordinates()
-
+    def objective(self, x):
+        # motors.move_to_array will return 1 when motors finished moving
+        while not self.motors.move_to_array(x):
+            pass
+        count = self.detector1.read()
+        if count < 0:
+            count = 0
+        # print("count: ", count)
+        return -1*count 
     def callback(self, x, f, accept):
-        #Append List here
-        self.database.addData(self.count, self.solution)
+        print("x ", x)
+        print("f ", f)
+        #ADD TO DATABASE when we know what x and f are 
+        self.database.addData(x, f)
+    def optimize(self, method):
+        #Objective partial func to include self
+        opt_instance = opt(self.experiment)
+        objective_with_self = partial(opt_instance.objective)
 
-    def optimize(self):
+        #callback partial func to include self 
+        callback_with_self = partial(self.callback)
+
+        #get x0 starting position
         x0 = self.experiment.get_motor_coordinates()
-        func = self.objective
-        take_step = MyTakeStep(self.experiment)
-        callback = self.callback
-        return basinhopping(func=func, x0=x0, niter=1000, T=1,
-                            minimizer_kwargs=None, take_step=take_step, callback=callback, interval=10, disp=True, niter_success=20, seed=None,
-                            target_accept_rate=0.25, stepwise_factor=0.9)
+        minimizer_kwargs = {"method" : method}
+
+        result = basinhopping(
+            func=objective_with_self,
+            x0=x0,
+            minimizer_kwargs= minimizer_kwargs,
+            callback=callback_with_self,
+            niter=self.niters,
+            stepsize=self.stepsize,
+            T = 0.05,
+            disp=True,
+            niter_success=20,
+            seed=None
+        )
+        return result
         
-class MyTakeStep:
-    def __init__(self, experiment, stepsize=20):
-        self.stepsize = stepsize
-        self.rng = np.random.default_rng()
-        self.experiment = experiment
-    def __call__(self, x):
-        s = self.stepsize
-        for i in range(len(x)): 
-            x[i] += self.rng.uniform(-s, s)
-        print("new coords: ", x)
-        self.experiment.move_to_array(x)
-        return x
+
+
+
