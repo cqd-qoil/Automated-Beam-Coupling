@@ -10,6 +10,8 @@ database = Database()
 basin_hopping_result = OptimizationAlgorithm.BasinHopping(experiment, database)
 
 # Create controller and run optimization
-controller = Controller.Controller(experiment, basin_hopping_result)
-controller.run(experiment)
-controller.model()
+try:
+    controller = Controller.Controller(experiment, basin_hopping_result)
+    controller.run(experiment)
+finally:
+    controller.model()
