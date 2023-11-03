@@ -20,12 +20,16 @@ class Controller:
 
     def method_loop(self, experiment):
         methods_full = ['Powell', 'Nelder-Mead', 'CG', 'BFGS', 'Newton-CG', 'L-BFGS-B', 'TNC', 
-                   'COBLYA', 'SLSQP', 'trust-constr', 'dogleg', 'trust-ncg', 'trust-exact', 'trust-krylov']
+                   'COBLYA', 'SLSQP', 'trust-constr', 'dogleg']
         
-        methods = ['Powell', 'Nelder-Mead', 'trust-krylov']
+        methods = ['Powell', 'Nelder-Mead']
 
         final_couplings = []
-    
+        """
+        Need to add different database for every method to get seperate graphs
+        OR 
+        model inside for loop
+        """
         try:
             for i in range(len(methods)): 
                 self.reset_pairing
