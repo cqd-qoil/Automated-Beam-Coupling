@@ -1,41 +1,82 @@
 import Detector
-from ZaberMotor import ZaberMotor
+import ZaberMotor
 from Database import Database 
 from scipy.optimize import basinhopping
 import random
 import math
+import time
+import numpy as np
+from scipy.optimize import minimize
+from functools import partial
 
-#Output Detector
-detector1 = Detector.PowerMeter('PM100D')
+class opt:
+    def __init__(self):
+        # Output Detector
+        self.detector1 = Detector.PowerMeter('PM100D')
+        # Motor initialization
+        self.motors = ZaberMotor.ZaberMotor()
+        self.motors.open_motor_connection()
 
-#Motor initialisation
-motors = ZaberMotor()
-motors.open_motor_connection()
-database = Database()
-
-def objective():
-    #Objective Function for Optimization
-    count = detector1.read()
-    return -1*count
-
-def take_step(self):
-    new_solution = [axis + random.uniform(-self.initial_step_size, self.initial_step_size) for axis in self.solution]
-    self.experiment.move_to_array(new_solution)
-    self.solution = new_solution
-    return new_solution
-
-# def callback(self):
-#     #Append List here
-#     self.database.addData(self.count, self.solution)
-#     pass
-
-def optimize(self):
-    return basinhopping(func=self.objective, x0=motors.get_motor_coordinates(), niter=1000, T=1, stepsize=20,
-                        minimizer_kwargs=None, interval=50, disp=True, niter_success=20, seed=None, stepwise_factor=0.9)
+    def objective(self, x):
+        # motors.move_to_array will return 1 when motors finished moving
+        while not self.motors.move_to_array(x):
+            pass
+        count = self.detector1.read()
+        if count < 0:
+            count = 0
+        # print("count: ", count)
+        return -1*count
     
-result = optimize()
+    def getMotors(self):
+        return self.motors.get_motor_coordinates()
+    
+    def move_to_array(self, x):
+        self.motors.move_to_array(x)
+    
+    def closeMotors(self):
+        self.motors.close_motor_connection()
+
+def optimize(opt_instance, ):
+    objective_with_self = partial(opt_instance.objective)
+    x0 = opt_instance.getMotors()
+
+    result = basinhopping(
+        func=objective_with_self,
+        x0=x0,
+        minimizer_kwargs={"method" : "Nelder-Mead"},
+        niter=30,
+        stepsize=20,
+        T = 0.05,
+        disp=True,
+        niter_success=20,
+        seed=None
+    )
+    return result
+
+trial = opt()
+
+try:
+    result = optimize(trial)
+    trial.move_to_array(result.x)
+finally:
+    trial.closeMotors()
+    print("Closed port")
 
 print("++++++++++++++++++  Optimization Complete, printing results...  +++++++++++++++++++++++")
 print(result.x)
 print(result.fun)
 print(result.message)
+
+# def local_optimization_test(objective, starting_points):
+#     for x0 in starting_points:
+#         res = minimize(objective, x0, method='Nelder-Mead')  # Use the same method as in basinhopping
+#         if not res.success:
+#             print(f"Local optimization failed for starting point {x0}")
+#             print(f"Message: {res.message}")
+#         else:
+#             print(f"Local optimization succeeded for starting point {x0}")
+#             print(f"Result: {res.x}")
+
+# starting_points = [np.random.rand(4) for _ in range(10)]
+# local_optimization_test(trial.objective, starting_points)
+
