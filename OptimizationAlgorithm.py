@@ -43,7 +43,7 @@ class BasinHopping(OptimizationAlgorithm):
     def __init__(self, experiment, database):
         self.experiment = experiment
         self.stepsize = 100
-        self.niters = 4
+        self.niters = 2
         self.database = database
 
     def objective(self, x):
@@ -55,9 +55,9 @@ class BasinHopping(OptimizationAlgorithm):
             count = 0
         # print("count: ", count)
         return -1*count 
-    def callback(self, x, f, accept):
-        print("x ", x)
-        print("f ", f)
+    def callback(self, f, x, accept):
+        # print("x ", x)
+        # print("f ", f)
         #ADD TO DATABASE when we know what x and f are 
         self.database.addData(x, f)
     def optimize(self, method):
@@ -81,7 +81,7 @@ class BasinHopping(OptimizationAlgorithm):
             stepsize=self.stepsize,
             T = 0.05,
             disp=True,
-            niter_success=20,
+            niter_success=5,
             seed=None
         )
         return result
