@@ -24,7 +24,10 @@ class ZaberMotor:
         Notes current coordinates, homes all axis then returns to starting
         Sometimes axis get blocked at half way this resets them
         """
-        pass
+        for i in range(len(self.device_list)):
+            device = self.device_list[i]
+            device.home()
+            device.wait_until_idle()
 
     def get_motor_coordinates(self):
         current_coords = []
@@ -38,3 +41,5 @@ class ZaberMotor:
             device = self.device_list[i]
             device.move_absolute(array[i], zm.Units.NATIVE)
             device.wait_until_idle()
+        #return 1 when completed
+        return 1
