@@ -89,14 +89,14 @@ class Database:
         time = range(len(self.countlist))
         ax.plot(time, self.countlist, color='black')
 
-        best_coupling = max(self.countlist)  # Corrected line
-        best_coupling_str = str(round(best_coupling, 4))
+        # best_coupling = max(self.countlist)
+        # best_coupling_str = str(round(best_coupling, 4))
 
         ax.set_title('Coupling vs Optimsation iteration (steps)')
         ax.set_xlabel('Time [Iteration #]')
         ax.set_ylabel('Normalised Photon Counts [#]')
-        caption = '\n\n\n\nConvergence is achieved at a coupling of ' + best_coupling_str + ' counts.'
-        ax.text(0.5, -0.1, caption, ha='center', va='center', transform=ax.transAxes)
+        # caption = '\n\n\n\nConvergence is achieved at a coupling of ' + best_coupling_str + ' counts.'
+        # ax.text(0.5, -0.1, caption, ha='center', va='center', transform=ax.transAxes)
 
         # Show the plot
         plt.show()
