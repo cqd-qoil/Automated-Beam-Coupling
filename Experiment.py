@@ -31,7 +31,7 @@ class Experiment:
     
     def benchmark(self):
         #Theoretical maximum pairing based off heralded detector split ration + filtering aspect
-        p_opt = (1.185/4.640) * self.detector2.read() #* self.filtering_coefficient
+        p_opt = (2.09/4.750) * self.detector2.read() #* self.filtering_coefficient
         return self.detector1.read()/p_opt
 
     def close_motor_connection(self):
