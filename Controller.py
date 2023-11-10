@@ -9,14 +9,15 @@ class Controller:
         self.database = Database.Database()
     
     def run(self, experiment):
-        self.method_loop(experiment)
-        # try:
-        #     solution = self.algorithm.optimize(method)
-        #     experiment.move_to_array(solution.x)
-        # finally:
-        #     experiment.close_motor_connection()
-        # # Use the optimal solution, e.g., align mirrors accordingly
-        # print("Solution found at:", solution.fun * -1000, "Optimal solution should be: ", self.experiment.benchmark())
+        # self.method_loop(experiment)
+        method = 'Nelder-Mead'
+        try:
+            solution = self.algorithm.optimize(method)
+            experiment.move_to_array(solution.x)
+        finally:
+            experiment.close_motor_connection()
+        # Use the optimal solution, e.g., align mirrors accordingly
+        print("Solution found at:", solution.fun * -1000, "Optimal solution should be: ", self.experiment.benchmark())
 
     def method_loop(self, experiment):
         methods_full = ['Powell', 'Nelder-Mead', 'CG', 'BFGS', 'Newton-CG', 'L-BFGS-B', 'TNC', 

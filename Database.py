@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 #######################################################################################################################
 #######################################################################################################################
 
+#Stefan looking for comparitor boards 
+
 class Database:
     """
     Class for tracking data through experiment and modelling when completed
