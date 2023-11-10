@@ -3,10 +3,10 @@ import time
 
 # Main Controller
 class Controller:
-    def __init__(self, experiment, algorithm):
+    def __init__(self, experiment, algorithm, database):
         self.experiment = experiment
         self.algorithm = algorithm
-        self.database = Database.Database()
+        self.database = database
     
     def run(self, experiment):
         # self.method_loop(experiment)
