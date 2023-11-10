@@ -17,6 +17,7 @@ class Database:
         self.solutions = []
         self.method = 'Not Set'
         self.est_maximum = 0
+        #add all run attributes?
 
     def addData(self, count, solution):
         # print("ADDING TO DATABASE: ", count, " ", solution)
