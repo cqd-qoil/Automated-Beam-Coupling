@@ -17,21 +17,25 @@ class Database:
         self.solutions = []
 
     def addData(self, count, solution):
+        print("ADDING TO DATABASE: ", count, " ", solution)
         self.addcount(count)
         self.addsolution(solution)
 
     def addcount(self, count):
         self.countlist.append(count)
+        print(self.countlist)
 
     def addsolution(self, solution):
         self.solutions.append(solution)
+        print(self.solutions)
 
     def print(self):
+        print("TRIAL SOLUTIONS:\n")
         for i in range(len(self.solutions)):
-            print("Solution: ", i, self.solutions[i])
+            print("Solution: ", i, " ", self.solutions[i])
 
         for i in range(len(self.countlist)):
-            print("Count: ", i, self.countlist[i])
+            print("Count: ", i," ", self.countlist[i])
 
     def modelCountVsAxis(self):
         """
@@ -56,19 +60,19 @@ class Database:
         fig, axs = plt.subplots(2, 2)
 
         # scatter plot x0 against p0
-        axs[0, 0].scatter(x1_steps, self.energylist, color='black')
+        axs[0, 0].scatter(x1_steps, range(len(self.solutions)), color='black')
         axs[0, 0].set_title('x1 vs Count')
 
         # scatter plot x0 against p1
-        axs[0, 1].scatter(y1_steps, self.energylist, color='black')
+        axs[0, 1].scatter(y1_steps, range(len(self.solutions)), color='black')
         axs[0, 1].set_title('y1 vs Count')
 
         # scatter plot x1 against p0
-        axs[1, 0].scatter(x2_steps, self.energylist, color='black')
+        axs[1, 0].scatter(x2_steps, range(len(self.solutions)), color='black')
         axs[1, 0].set_title('x2 vs Count')
 
         # scatter plot x1 against p1
-        axs[1, 1].scatter(y2_steps, self.energylist, color='black')
+        axs[1, 1].scatter(y2_steps, range(len(self.solutions)), color='black')
         axs[1, 1].set_title('y2 vs Count')
 
         # adjust spacing between subplots
