@@ -15,28 +15,37 @@ class Database:
     def __init__(self):
         self.countlist = []
         self.solutions = []
+        self.method = 'Not Set'
+        self.est_maximum = 0
 
     def addData(self, count, solution):
-        print("ADDING TO DATABASE: ", count, " ", solution)
+        # print("ADDING TO DATABASE: ", count, " ", solution)
         self.addcount(count)
         self.addsolution(solution)
 
     def addcount(self, count):
         self.countlist.append(count)
-        print(self.countlist)
+        # print(self.countlist)
 
     def addsolution(self, solution):
         self.solutions.append(solution)
-        print(self.solutions)
+        # print(self.solutions)
+        
+    def setMethod(self, method):
+        self.method = method
+
+    def set_est_max(self, max):
+        self.est_maximum = max
 
     def print(self):
-        print("TRIAL SOLUTIONS:\n")
+        # print("TRIAL SOLUTIONS:\n")
         for i in range(len(self.solutions)):
             print("Solution: ", i, " ", self.solutions[i])
 
         for i in range(len(self.countlist)):
             print("Count: ", i," ", self.countlist[i])
-
+    #Change in srep size vs power
+    
     def modelCountVsAxis(self):
         """
         Models Photon count vs Solution steps 
@@ -79,7 +88,7 @@ class Database:
         plt.subplots_adjust(wspace=0.3, hspace=0.5)
 
         # add caption to the figure
-        fig.text(0.5, 0.01, 'Axis coordinate vs Normalised Photon Counts (#).', ha='center')
+        fig.text(0.5, 0.01, 'Axis coordinate vs Normalised Photon Counts (#).' + self.method, ha='center')
 
         # display the plot
         plt.show()
@@ -98,7 +107,7 @@ class Database:
         # best_coupling = max(self.countlist)
         # best_coupling_str = str(round(best_coupling, 4))
 
-        ax.set_title('Coupling vs Optimsation iteration (steps)')
+        ax.set_title('Coupling vs Optimsation iteration (steps) for ' + self.method + ' method')
         ax.set_xlabel('Time [Iteration #]')
         ax.set_ylabel('Normalised Photon Counts [#]')
         # caption = '\n\n\n\nConvergence is achieved at a coupling of ' + best_coupling_str + ' counts.'
