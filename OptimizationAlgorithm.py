@@ -40,11 +40,15 @@ class opt():
         return -1*count
 
 class BasinHopping(OptimizationAlgorithm):
-    def __init__(self, experiment, database):
+    def __init__(self, experiment, database, iters, method = 'Nelder-Mead', niter_success = 10, temp = 0.5, seed=None):
         self.experiment = experiment
         self.stepsize = 100
-        self.niters = 2
+        self.niters = iters
         self.database = database
+        self.method = method
+        self.niter_success = niter_success
+        self.temp = temp
+        self.seed = seed
 
     def objective(self, x):
         # motors.move_to_array will return 1 when motors finished moving
@@ -60,7 +64,7 @@ class BasinHopping(OptimizationAlgorithm):
         # print("f ", f)
         #ADD TO DATABASE when we know what x and f are 
         self.database.addData(x, f)
-    def optimize(self, method):
+    def optimize(self):
         #Objective partial func to include self
         opt_instance = opt(self.experiment)
         objective_with_self = partial(opt_instance.objective)
@@ -70,7 +74,7 @@ class BasinHopping(OptimizationAlgorithm):
 
         #get x0 starting position
         x0 = self.experiment.get_motor_coordinates()
-        minimizer_kwargs = {"method" : method}
+        minimizer_kwargs = {"method" : self.method}
 
         result = basinhopping(
             func=objective_with_self,
@@ -79,10 +83,10 @@ class BasinHopping(OptimizationAlgorithm):
             callback=callback_with_self,
             niter=self.niters,
             stepsize=self.stepsize,
-            T = 0.05,
+            T = self.temp,
             disp=True,
-            niter_success=5,
-            seed=None
+            niter_success=self.niter_success,
+            seed=self.seed
         )
         return result
         
