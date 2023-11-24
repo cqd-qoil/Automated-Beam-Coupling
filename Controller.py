@@ -17,15 +17,16 @@ class Controller:
         # Use the optimal solution, e.g., align mirrors accordingly
         print("Solution found at:", solution.fun * -1000, "Optimal solution should be: ", self.experiment.benchmark())
  
-    def reset_pairing(self, experiment):
+    def reset_pairing(self):
         paired = [7632.0, 14132.0, -5695.0, -6508.0]
         # motors.reset_motor_axis()
-        experiment.move_to_array(paired)
+        self.experiment.move_to_array(paired)
         time.sleep(2)
 
     def model(self):
         # self.database.print()
-        self.database.modelCountVsTime()
-        self.database.modelCountVsAxis()
+        bench = self.experiment.benchmark()
+        self.database.modelCountVsTime(bench)
+        self.database.modelCountVsAxis(bench)
         
 
