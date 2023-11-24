@@ -11,6 +11,10 @@ class Experiment:
         #Split Beam Detector
         self.detector2 = Detector.PowerMeter('PM16')
 
+        #Something like this to handle detectors as param for experiment()
+        # for i in list_detectors:
+        #     self.detector + i = list_detectors[i]
+
         #Motor initialisation
         self.motors = ZaberMotor.ZaberMotor()
         self.motors.open_motor_connection()
@@ -31,7 +35,7 @@ class Experiment:
     
     def benchmark(self):
         #Theoretical maximum pairing based off heralded detector split ration + filtering aspect
-        p_opt = (2.09/4.750) * self.detector2.read() #* self.filtering_coefficient
+        p_opt = (0.501) * self.detector2.read() #* self.filtering_coefficient
         return self.detector1.read()/p_opt
 
     def close_motor_connection(self):
