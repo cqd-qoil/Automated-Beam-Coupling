@@ -31,7 +31,7 @@ def all_methods():
         #Reset solution to pairing coordinates
         experiment.move_to_array(paired)
         database = Database()
-        iterations = 20
+        iterations = 3
         niter_success = 10
         temp = 0.6
         basin_hopping_result = OptimizationAlgorithm.BasinHopping(experiment=experiment, 
