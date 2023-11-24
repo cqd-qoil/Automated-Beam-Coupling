@@ -48,8 +48,3 @@ The output of the optimise function will be a dictionary containing `x0`: the co
 ## Experimental Results 
 Experimental data model examples with 'Database.py' class:
 
-
-## Contact Information
-If you have any questions or comments about the software, I can be contacted either via email <brendanwallis01@gmail.com>, mobile 0421883516, or <a href="https://www.linkedin.com/in/brendan-wallis-5bb214192/" target="_blank">LinkedIn</a>.
-
-
