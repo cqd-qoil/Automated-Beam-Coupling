@@ -15,7 +15,7 @@ class Controller:
         finally:
             experiment.close_motor_connection()
         # Use the optimal solution, e.g., align mirrors accordingly
-        print("Solution found at:", solution.fun * -1000, "Optimal solution should be: ", self.experiment.benchmark())
+        print("Solution found at:", -1 * solution.fun, " [W]. Optimal solution should be: ", self.experiment.benchmark(), "[W]")
  
     def reset_pairing(self):
         paired = [7632.0, 14132.0, -5695.0, -6508.0]
