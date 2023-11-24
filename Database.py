@@ -3,6 +3,7 @@
 #Database Libraries
 #Modelling Libraries 
 import matplotlib.pyplot as plt
+import numpy as np
 #######################################################################################################################
 #######################################################################################################################
 
@@ -103,7 +104,12 @@ class Database:
         #Plot for energy (coupling) vs solution coordinates
         fig, ax = plt.subplots()
         time = range(len(self.countlist))
-        ax.plot(time, self.countlist, color='black')
+
+        # rel_count = []
+        # for i in range(len(self.countlist)):
+        #         rel_count[i] = -1 * self.countlist[i] / bench
+
+        ax.plot(time, -1 * self.countlist, color='black')
 
         # best_coupling = max(self.countlist)
         # best_coupling_str = str(round(best_coupling, 4))
@@ -111,7 +117,7 @@ class Database:
         ax.set_title('Coupling vs Optimsation iteration (steps) for ' + self.method + ' method')
         ax.set_xlabel('Time [Iteration #]')
         ax.set_ylabel('Normalised Photon Counts [#]')
-        caption = '\n\n\n\nConvergence is achieved at a coupling of ' + bench + ' counts.'
+        # caption = '\n\n\n\nConvergence is achieved at a coupling of ' + str(bench) + ' counts.'
         # ax.text(0.5, -0.1, caption, ha='center', va='center', transform=ax.transAxes)
 
         # Show the plot
