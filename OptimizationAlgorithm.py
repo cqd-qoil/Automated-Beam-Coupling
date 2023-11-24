@@ -40,9 +40,9 @@ class opt():
         return -1*count
 
 class BasinHopping(OptimizationAlgorithm):
-    def __init__(self, experiment, database, iters, method = 'Nelder-Mead', niter_success = 10, temp = 0.5, seed=None):
+    def __init__(self, experiment, database, iters, method = 'Nelder-Mead', stepsize = 100, niter_success = 10, temp = 0.5, seed=None):
         self.experiment = experiment
-        self.stepsize = 100
+        self.stepsize = stepsize
         self.niters = iters
         self.database = database
         self.method = method
