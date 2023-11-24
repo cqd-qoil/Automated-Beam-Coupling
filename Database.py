@@ -47,7 +47,7 @@ class Database:
             print("Count: ", i," ", self.countlist[i])
     #Change in srep size vs power
     
-    def modelCountVsAxis(self):
+    def modelCountVsAxis(self, bench):
         """
         Models Photon count vs Solution steps 
 
@@ -94,7 +94,7 @@ class Database:
         # display the plot
         plt.show()
     
-    def modelCountVsTime(self):      
+    def modelCountVsTime(self, bench):      
         """
         Models Photon count achieved vs iteration 
 
@@ -111,7 +111,7 @@ class Database:
         ax.set_title('Coupling vs Optimsation iteration (steps) for ' + self.method + ' method')
         ax.set_xlabel('Time [Iteration #]')
         ax.set_ylabel('Normalised Photon Counts [#]')
-        # caption = '\n\n\n\nConvergence is achieved at a coupling of ' + best_coupling_str + ' counts.'
+        caption = '\n\n\n\nConvergence is achieved at a coupling of ' + bench + ' counts.'
         # ax.text(0.5, -0.1, caption, ha='center', va='center', transform=ax.transAxes)
 
         # Show the plot
