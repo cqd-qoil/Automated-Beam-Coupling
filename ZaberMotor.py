@@ -1,7 +1,7 @@
 #Zaber Motion Libraries
 import zaber_motion.binary as zmb
 import zaber_motion as zm
-
+import time
 class ZaberMotor:
     def __init__(self):
         self.device_list = []
@@ -9,9 +9,16 @@ class ZaberMotor:
         # self.reset_motor_axis(324)
         
     def open_motor_connection(self):
-        while (len(self.device_list) < 4):
+        # while (len(self.device_list) < 4):
+        try:
             self.connection = zmb.Connection.open_serial_port('COM3')
             self.device_list = self.connection.detect_devices()
+            if len(self.device_list) < 3:
+                time.sleep(1)
+                print("Did not find 4 motors. Trying again...")
+        except:
+            print("Failed motor connection, trying again...")
+        finally:
             print("\nConnection open")
             print("Found {} devices\n".format(len(self.device_list)))
 
