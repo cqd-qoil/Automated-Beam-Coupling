@@ -43,7 +43,7 @@ class PowerMeter(Detector):
                 inst = rm.open_resource(item)
                 idn = inst.query('*IDN?').strip()
                 print("\nVISA Resource: ",item, ", IDN: ",idn)  # Print information about detected devices
-                if device_name in idn:  # Search for device model 
+                if device_name in idn:  # Search for device model
                     pm_addr = item
                     break
             except Exception as e:
@@ -55,7 +55,7 @@ class PowerMeter(Detector):
         else:
             print("Power meter not found.")
             return 0
-        
+
     def list_all_addresses(device_name):
         """
         Takes device name argument and searches through resources for it
@@ -74,7 +74,7 @@ class PowerMeter(Detector):
 
     def power_meter_init(self, wv):
         """
-        Function initialises power meter COMPORT and configures PM returns pm object or none if not found 
+        Function initialises power meter COMPORT and configures PM returns pm object or none if not found
         """
         rm = visa.ResourceManager()
         if self.address != 0:
@@ -89,14 +89,14 @@ class PowerMeter(Detector):
             return power_meter
         else:
             print("power meter address not found")
-            return None 
-        
+            return None
+
     def read(self):
         """
-        Function to sample power reading off power meter. Samples n measurements 
+        Function to sample power reading off power meter. Samples n measurements
         then returns avg power and standard deviation in power
 
-        Input: 
+        Input:
         Output: pMean: Avg power over n interval, pStd: Standard deviation in measurement
         """
         power_samples = 30
@@ -110,16 +110,16 @@ class Logic16(Detector):
         # Initialization code, including opening the tagger
         self.MyTagger = TTInterface()
         self.MyTagger.Open
-        
+
         # Configure the channel for measurement
         self.timeInterval = 0.5
         self.channel = 2
         self.MyTagger.SetInputThreshold(self.channel, 0.5)
-        
+
         # Activate the Logic Mode
         self.MyLogic = Logic(self.MyTagger)
         self.MyLogic.SwitchLogicMode()
-        
+
         self.TimerCounter1 = Int32
         self.clearBuffer()
 

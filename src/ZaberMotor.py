@@ -7,7 +7,7 @@ class ZaberMotor:
         self.device_list = []
         self.open_motor_connection()
         # self.reset_motor_axis(324)
-        
+
     def open_motor_connection(self):
         # while (len(self.device_list) < 4):
         try:
@@ -40,7 +40,7 @@ class ZaberMotor:
         current_coords = []
         for device in range(len(self.device_list)):
             device = self.device_list[device]
-            current_coords.extend([device.get_position()]) 
+            current_coords.extend([device.get_position()])
         return current_coords
 
     def move_to_array(self, array):
