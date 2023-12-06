@@ -7,8 +7,8 @@ import time
 import clr
 
 #Adding Logic16 driver to path ensure this is 64bit version and that you have selected allow permissions
-sys.path.append('C:\\Users\\lab\\Downloads\\CD V2.35.01\\Applications\\TimeTagExplorer\\Release_2_35_64Bit\\Release')
-clr.AddReference('C:\\Users\\lab\\Downloads\\CD V2.35.01\\Applications\\TimeTagExplorer\\Release_2_35_64Bit\\Release\\ttInterface.dll')
+sys.path.append('.')
+clr.AddReference('.\\bin\\ttInterface.dll')
 
 #Time Tagging Libraries
 from System import Array, Byte, Int64, Int32
@@ -105,42 +105,98 @@ class PowerMeter(Detector):
         pStd = power.std()
         return pMean
 
+def binary_code(channel):
+    """
+    For use in Logic16
+    """
+    if isinstance(channel, Sequence):
+        return sum([binary_code(k) for k in channel])
+    else:
+        return 2**(channel-1)
+
 class Logic16(Detector):
-    def __init__(self):
-        # Initialization code, including opening the tagger
+    def __init__(self, logic_mode=True):
         self.MyTagger = TTInterface()
-        self.MyTagger.Open
+        self.MyTagger.Open()
+        self._resolution = self.MyTagger.GetResolution()
+        self._logic_mode = False
+        if logic_mode == True:
+            self._logic_mode = True
+            self.MyLogic = Logic(self.MyTagger)
+            self.MyLogic.SwitchLogicMode()
 
-        # Configure the channel for measurement
-        self.timeInterval = 0.5
-        self.channel = 2
-        self.MyTagger.SetInputThreshold(self.channel, 0.5)
-
-        # Activate the Logic Mode
-        self.MyLogic = Logic(self.MyTagger)
-        self.MyLogic.SwitchLogicMode()
+        self._total_channels = self.MyTagger.GetNoInputs()
+        self._integration_window = 0.5 # same as self.timeInterval
+        self._coincidence_window = 1e-9
+        self.singles = None
+        self.coincidences = None
 
         self.TimerCounter1 = Int32
-        self.clearBuffer()
+        self.clear_buffer()
 
-    def clearBuffer(self):
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.MyTagger.Close()
+
+    def set_channels(self, singles, coincidences=None):
+        assert isinstance(singles, Sequence)
+        self.singles = singles
+        self._bsingles = [binary_code(channel) for channel in singles]
+        if coincidences is not None:
+            assert isinstance(coincidences[0], Sequence)
+            self.coincidences = coincidences
+            self._bcoincidences = [binary_code(pair) for pair in coincidences]
+
+    def set_delays(self, channel_delay_dict=dict(), default_delay=100):
+        if hasattr(self,'delays'):
+            for k,v in channel_delay_dict.items():
+                assert k in range(1, self._total_channels+1)
+                self.delays.update({k:v})
+                self.MyTagger.SetDelay(k, (v*1e-9)/self._resolution)
+        else:
+            self.delays = {k:default_delay for k in range(1, self._total_channels+1)}
+            self.set_delays(channel_delay_dict=channel_delay_dict)
+
+    def set_input_threshold(self,channel_threshold_dict=None,default_threshold=0.5):
+        # Configure the channel for measurement
+        if channel_threshold_dict is not None:
+            for k,v in channel_threshold_dict.items():
+                assert k in range(1, self._total_channels+1)
+                # Does the channel is the actual channel or the binary-coded channel?
+                self.MyTagger.SetInputThreshold(k, v)
+        else:
+            for k in range(1, self._total_channels+1): # 16 channels if low-resolution
+                self.MyTagger.SetInputThreshold(k, default_threshold)
+
+    def set_coincidence_window(self, window):
+        assert self._logic_mode
+        self._coincidence_window = window*1e-9
+        self.MyLogic.SetWindowWidth(self._coincidence_window/self._resolution)
+
+    def get_status(self):
+        msg = '>>> Logic16 counting card\n'
+        msg += '> FPGA version:\t\t{}\n'.format(self.MyTagger.GetFpgaVersion())
+        msg += '> Resolution:\t\t{}\n'.format(self._resolution)
+        msg += '> Input channels:\t{}\n'.format(self.MyTagger.GetNoInputs())
+        msg += '> Integration window:\t{} s\n'.format(self._integration_window)
+        msg += '> Coincidence window:\t{} ns\n'.format(self._coincidence_window*1e9)
+        # msg += '> Singles in [{}]'.format(self.singles)
+        print(msg)
+
+    def clear_buffer(self):
         self.MyLogic.ReadLogic()
         TimeCounter1 = self.MyLogic.GetTimeCounter()
 
-    def readCounts(self, timeInterval, channel):
+    def read_counts(self, channel_pos, channel_neg=0, normalize=False):
         """
         Reads Counts for time interval
         """
-        #Let Logic16 collect data for timeInterval [s]
-        time.sleep(timeInterval)
-        #Read count off logic
         self.MyLogic.ReadLogic()
-        #Get exact time of collection
         TimeCounter1 = self.MyLogic.GetTimeCounter()
-        counts=self.MyLogic.CalcCountPos(2**(channel-1))
-        #Normalise counts to 1 second
-        delta_t=(TimeCounter1)*5e-9
-        return counts, delta_t
+        counts = self.MyLogic.CalcCount(channel_pos, channel_neg)
+        return counts, TimeCounter1
 
     def getAvgPhotonCount(self, timeInterval, channel):
         """
