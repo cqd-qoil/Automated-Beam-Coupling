@@ -1,6 +1,7 @@
 
 #OptimizationAlgorithm Libraries
 from abc import ABC, abstractmethod
+from collections.abc import Sequence
 #Logic16 Libraries
 import sys
 import time
@@ -195,7 +196,19 @@ class Logic16(Detector):
         """
         self.MyLogic.ReadLogic()
         TimeCounter1 = self.MyLogic.GetTimeCounter()
-        counts = self.MyLogic.CalcCount(channel_pos, channel_neg)
+
+        def calc_single_count(pos, neg):
+            return self.MyLogic.CalcCount(binary_code(pos), binary_code(neg))
+
+        if isinstance(channel_pos[0], Sequence):
+            if channel_neg == 0:
+                channel_neg = [0]*len(channel_pos)
+            counts = []
+            for pos, neg in zip(channel_pos, channel_neg):
+                iter_counts = calc_single_count(pos, neg)
+                counts.append(iter_counts)
+        else:
+            counts = calc_single_count(channel_pos, channel_neg)
         return counts, TimeCounter1
 
     def getAvgPhotonCount(self, timeInterval, channel):
